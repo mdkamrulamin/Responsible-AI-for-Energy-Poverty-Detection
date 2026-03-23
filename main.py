@@ -1,8 +1,8 @@
-from src.build_master_dataset import build_master_dataset, save_master_dataset
+from src.prepare_sequences import prepare_lstm_inputs
 
 def main():
-    master_df = build_master_dataset()
-    save_master_dataset(master_df)
+    X_train, X_val, X_test, scaler = prepare_lstm_inputs()
+    
     
 
 if __name__ == "__main__":

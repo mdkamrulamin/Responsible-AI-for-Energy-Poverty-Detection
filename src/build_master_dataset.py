@@ -9,6 +9,8 @@ from src.preprocess import (
     preprocess_weather_data
 )
 
+from src.config import MASTER_DATASET_PATH
+
 def build_master_dataset() -> pd.DataFrame:
     demand_df = load_raw_electricity_demand_data()
     weather_df = load_raw_ontario_proxy_temp_data()
@@ -36,7 +38,7 @@ def build_master_dataset() -> pd.DataFrame:
     
     return master_df
 
-def save_master_dataset(master_df: pd.DataFrame, path: str = "outputs/master_dataset_2019_2023.csv") -> None:
+def save_master_dataset(master_df: pd.DataFrame, path: str = MASTER_DATASET_PATH) -> None:
     master_df.to_csv(path, index=False)
     print(f"\nMaster dataset saved to: {path}")
     
