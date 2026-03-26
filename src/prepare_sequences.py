@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
-from src.config import FEATURE_COL, MASTER_DATASET_PATH, SEQUENCE_LENGTH
+import joblib
+from src.config import FEATURE_COL, MASTER_DATASET_PATH, SEQUENCE_LENGTH, ARTIFACTS_SAVE_PATH
 from sklearn.preprocessing import MinMaxScaler
 
 def load_master_dataset(path: str = MASTER_DATASET_PATH) -> pd.DataFrame:
@@ -70,7 +71,22 @@ def scale_demand_data(
     test_df: pd.DataFrame, 
     feature_col: str = FEATURE_COL
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, MinMaxScaler]:
-    #Fit scaler during training and then transform validaton and test
+    """
+    As hourly_demand (feature) values are very large numbers like:
+    13,000,000 or 18,000,000 (check master dataset in outputs folder).
+    These raw large values can be a problem for NN. So scaling transforms
+    them into a smaller consistent range like: 0.00, 0.45. This will 
+    make models easier to train.
+    """
+    #Fit scaler during training and then transform validation and test
+    """
+    Scaling helps for stable training: NN learn by adjusting weights using gradients.
+    If values are large, the gradients will be unstable, learning can become too slow
+    or too erratic. So scaling makes the optimization process smoother.
+    When inputs are all within a similar range, the model can learn faster.
+    Scaling will help our autoencoder model's reconstruction error easier to work with
+    """
+    #MinMaxScaler rescales data to smallest value to 0 and largest value to 1
     
     scaler = MinMaxScaler()
     
@@ -79,8 +95,8 @@ def scale_demand_data(
     test_val = test_df[[feature_col]].values
     
     train_scaled = scaler.fit_transform(train_val)
-    val_scaled = scaler.fit_transform(val_val)
-    test_scaled = scaler.fit_transform(test_val)
+    val_scaled = scaler.transform(val_val)
+    test_scaled = scaler.transform(test_val)
     
     print("\n::Scaling summary::")
     print("Train scaled min/max:", train_scaled.min(), train_scaled.max())
@@ -118,12 +134,13 @@ def prepare_lstm_inputs(
     train_df, val_df, test_df = split_dataset_by_time(df)
     
     #Scale data
-    train_scaled, val_scaled, test_scaled, scaler = scale_demand_data(train_df, val_df, test_df)
+    train_scaled, val_scaled, test_scaled, scaler = scale_demand_data(
+        train_df, val_df, test_df)
     
     #Create sequences for scaled data
-    X_train = create_sequences(train_scaled)
-    X_val = create_sequences(val_scaled)
-    X_test = create_sequences(test_scaled)
+    X_train = create_sequences(train_scaled, sequence_length=sequence_length)
+    X_val = create_sequences(val_scaled, sequence_length=sequence_length)
+    X_test = create_sequences(test_scaled, sequence_length=sequence_length)
     
     print("\n::SEQUENCE SUMMARY::")
     print("Sequence length:", sequence_length)
@@ -132,3 +149,21 @@ def prepare_lstm_inputs(
     print("X_test shape: ", X_test.shape)
     
     return X_train, X_val, X_test, scaler
+
+def save_artifacts(
+    X_train: np.ndarray, 
+    X_val: np.ndarray, 
+    X_test: np.ndarray, 
+    scaler: MinMaxScaler, 
+    output_dir: str = ARTIFACTS_SAVE_PATH) -> None:
+    #Save all numpy arrays and scaler for later use
+    
+    os.makedirs(output_dir, exist_ok=True)
+    
+    np.save(os.path.join(output_dir, "X_train.npy"), X_train)
+    np.save(os.path.join(output_dir, "X_val.npy"), X_val)
+    np.save(os.path.join(output_dir, "X_test.npy"), X_test)
+    joblib.dump(scaler, os.path.join(output_dir, "demand_scaler.pkl"))
+    
+    print(f"\nSaved artifacts to: {output_dir}")
+    
