@@ -1,14 +1,12 @@
-from src.train_autoencoder import run_training
-from src.config import ARTIFACTS_SAVE_PATH, MODEL_SAVE_PATH, PLOTS_SAVE_PATH, EPOCHS, BATCH_SIZE
+from src.detect_anomalies import run_detection
+from src.config import ARTIFACTS_SAVE_PATH, LSTM_SAVED_MODEL_PATH, THRESHOLD_PERCENTILE
 
 def main():
-    run_training(
-        input_dir=ARTIFACTS_SAVE_PATH,
-        model_output_dir=MODEL_SAVE_PATH,
-        plot_output_dir=PLOTS_SAVE_PATH,
-        epochs=EPOCHS,
-        batch_size=BATCH_SIZE
-    )
+   run_detection(
+       artifacts_dir=ARTIFACTS_SAVE_PATH,
+       model_path=LSTM_SAVED_MODEL_PATH,
+       threshold_percentile=THRESHOLD_PERCENTILE
+   )
     
     
 

@@ -8,6 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 def load_master_dataset(path: str = MASTER_DATASET_PATH) -> pd.DataFrame:
     if not os.path.exists(path):
+        print((f"Master dataset not found in: {path}"))
         db = build_master_dataset()
         save_master_dataset(db)
         # raise FileNotFoundError(f"Master dataset not found in: {path}")

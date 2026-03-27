@@ -7,6 +7,11 @@ ARTIFACTS_SAVE_PATH = "outputs/processed_artifacts"
 BATCH_SIZE: int = 32
 EPOCHS: int = 50
 MODEL_SAVE_PATH = "outputs/models"
+LSTM_SAVED_MODEL_PATH = "outputs/models/lstm_autoencoder.keras"
 
 #Plots
 PLOTS_SAVE_PATH = "outputs/plots"
+
+#Anomaly
+ANOMALY_SAVE_PATH = "outputs/anomaly_results"
+THRESHOLD_PERCENTILE: float = 95.0
