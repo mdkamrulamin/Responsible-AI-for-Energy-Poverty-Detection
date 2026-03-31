@@ -28,13 +28,6 @@ cd <your-repo-name>
 pip install -r requirements.txt
 ```
 
-## Data Setup
-
-Place the following files inside the `data/` folder:
-
-* `ontario_electricity_demand.csv`
-* `ontario_weather_proxy_2018_2023_heat24.csv`
-
 ## Run the Project
 
 To run the backend pipeline:
@@ -70,8 +63,6 @@ The project generates outputs such as:
 * top event tables for dashboard use
 
 ## Example Visuals
-
-> Replace these filenames with your actual image filenames placed in the project root.
 
 ![Dashboard Overview](dashboard_overview.png)
 
